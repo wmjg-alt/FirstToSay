@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>FirstToSay</title>
+  </head>
+  <body style="background-color: black; color: grey">
+    <h1>Say Something Original</h1>
+    {% if not username %}
+      <form method="POST" action="/login">
+        {% if error %}
+        <label for="username">{{error}}</label>
+        {% else %}
+        <label for="username">Enter your name:</label>
+        {% endif %}
+        <br>
+        <input type="text" id="username" name="username">
+        <br>
+        <input type="submit" value="Log in">
+      </form>
+    {% else %}
+      <p>Logged in as {{ username }}</p>
+      <form method="POST" action="/" align="center">
+        <input type="text" id="username" name="username" value="{{ username }}" hidden>
+        <br>
+        <label for="user-text">Enter your text:</label>
+        <br>
+        <textarea id="user-text" name="user_text" style="width:65%;height:10%; font-size:200%"></textarea>
+        <br>
+        <input type="submit" value="Say it">
+      </form>
+      {% if matched %}
+        <h1 class="color:red;"> Your quote already entered by another...</h1>
+      {% endif %}
+      {% if posted_text %}
+        <br><br>
+        <h2> Your quote: </h2>
+        <p> Text: {{ posted_text }}</p>
+        <p>Author: {{ username }}</p>
+        {% if results %}
+            <h2> Most similar texts:</h2>
+            {% for result in results %}
+                <p>Text: {{ result[0] }}</p>
+                <p>Author: {{ result[1] }}</p>
+                <p>Similarity: {{ result[2] }}</p>
+                <p>Entered: {{ result[3] }}</p>
+            {% endfor %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  </body>
+</html>
