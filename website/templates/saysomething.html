@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %} First To Say... {% endblock %}
+{% block content %} 
+<br/>
+    <h1 align="center"> First To Say </h1>
+    <br/>
+    <form method="POST">
+        <textarea name="text" class="form-control bg-black text-bg-dark" rows="3" maxlength="256" autofocus style="font-size:2em"></textarea>
+        <br/>
+        <div align="center">
+            <button type="submit" class="btn btn-lg btn-dark">SPEAK</button>
+        </div>
+    </form>
+{% endblock %}
+
+

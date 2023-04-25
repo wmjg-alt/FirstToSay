@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %} posts_template {% endblock %}
+{% block content %} 
+<br/>
+<h3 align="center"> {% block header %} QUOTES {% endblock %} </h3>
+<br/>
+<div id='posts' class="row row-cols-1 row-cols-md-3 g-4">
+    {% for post in posts %}
+    <div class="col">
+        {% if ran and success and post.sim == 1.0 %}
+        <div class="card border-info border-3 bg-dark text-bg-dark h-100">
+        {% elif ran and post.sim >= 0.9 %}
+        <div class="card border-danger border-3 bg-dark text-bg-dark h-100">
+        {% else %}
+        <div class="card border-dark border-3 bg-dark text-bg-dark h-100">
+        {% endif %}
+            <div class="carder-header d-flex justify-content-between align-items-center">
+                <a href="/profile/{{ post.user.username }}" class="link-info"> {{ post.user.username|title }} </a>
+                {% if post.sim %}
+                    SIMILARITY: {{ "%.2f"|format(post.sim) }}
+                {% else %}
+                {% endif %}
+                <div>
+                    <span id="likes-count-{{post.id}}">{{ post.likes|length }}</span>
+                    {% if current_user.id in post.likes|map(attribute='author')|list %}
+                        <i class="fas fa-heart fa-xl" style="color: red;" id="likes-button-{{post.id}}" onclick="like({{ post.id }})"></i>
+                    {% else %}
+                        <i class="far fa-heart fa-xl" style="color: grey;" id="likes-button-{{post.id}}" onclick="like({{ post.id }})"></i>
+                    {% endif %}
+                </div>
+                
+            </div>
+            <div class="card-body">
+                <div class="card-text">{{ post.text|capitalize }}</div>
+            </div>
+            <div class="card-footer text-bg-secondary" align="center">
+                {{ post.date_created }}
+            </div>
+        </div>
+        <br/>
+    </div>
+    {% endfor %}
+</div>
+
+    {% block footer %}
+    {% endblock %}
+{% endblock %}
