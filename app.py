@@ -82,7 +82,7 @@ def compare_texts(user_text):
             text_ratio = difflib.SequenceMatcher(None, user_text, database_text).ratio()
             if text_ratio > 0.7:
                 similarities.append((database_text, database_author, text_ratio, entry_date))
-            if text_ratio >= 0.95 or matched:
+            if text_ratio >= 0.90 or matched:
                 matched = True
         similarities.sort(key=lambda x: x[2], reverse=True)
     
@@ -96,9 +96,9 @@ def wipe_db():
 
 def pre_fill_db():
     import pandas as pd
-    #https://www.kaggle.com/datasets/manann/quotes-500k
+    # https://www.kaggle.com/datasets/manann/quotes-500k
     # https://www.kaggle.com/datasets/iampunitkmryh/funny-quotes?resource=download
-    #  https://www.kaggle.com/datasets/faseehurrehman/popular-quotes
+    # https://www.kaggle.com/datasets/faseehurrehman/popular-quotes
 
     qt = pd.read_csv('data/quotes.csv', encoding='utf8')
     qts = pd.concat([pd.read_csv('data/quotes.csv', encoding='utf8'),
