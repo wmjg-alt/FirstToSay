@@ -167,6 +167,5 @@ def pre_fill_db(db,es,index_name):
         os.remove(fail_file)
     
     injest_csv_to_dfs(['data/quotes.csv','data/quotes_funny.csv','data/Popular_Quotes.csv', 'data/quotes2,csv'], db)
-
     print("bulk processing db to es")
     bulk_process_quotes(db, es, index_name, )
