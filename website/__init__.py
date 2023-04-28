@@ -100,12 +100,16 @@ def create_database(app,db,es):
         if not es.indices.exists(index=index_name):
             print("ES index "+ index_name + " recreated")
             es.indices.create(index=index_name, body=mapping,)
-        
+
         escount = es.cat.count(index=index_name, params={"format": "json"})[0]['count']
         with app.app_context():
             from .models import User, Quote, Like
             qcount = Quote.query.count()
         
+        if qcount <= 200000:
+            import os
+            os.remove("instance/"+DB_NAME)
+            raise Exception('db is empty -- deleted')
         print(f"Number of documents in '{index_name}' index: {escount}\nNumber in QUOTES db:{qcount}")
         if int(escount) != int(qcount):
             from website.helper_funcs import bulk_process_quotes

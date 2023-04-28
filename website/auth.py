@@ -16,23 +16,24 @@ def login():
         pwd = request.form.get('password')
         if not emailuser or not pwd:
             flash('Enter an email/username and a password', category='error')
-
-        if "@" in emailuser:
-            emailuser = emailuser.lower()
-            user = User.query.filter_by(email=emailuser).first()
         else:
-            emailuser = emailuser.lower()
-            user = User.query.filter_by(username=emailuser).first()
-
-        if user:
-            if check_password_hash(user.password, pwd):
-                flash('Successfully logged in as '+emailuser)
-                login_user(user,remember=True)
-                return redirect(url_for('views.home'))
+            if "@" in emailuser:
+                emailuser = emailuser.lower()
+                user = User.query.filter_by(email=emailuser).first()
             else:
-                flash('Password fail, incorrect', category="error")
-        else:
-            flash('No registered user associated with '+emailuser, category="error")
+                emailuser = emailuser.lower()
+                user = User.query.filter_by(username=emailuser).first()
+            print(emailuser, user)
+
+            if user:
+                if check_password_hash(user.password, pwd):
+                    flash('Successfully logged in as '+emailuser, category='success')
+                    login_user(user,remember=True)
+                    return redirect(url_for('views.home'))
+                else:
+                    flash('Password fail, incorrect', category="error")
+            else:
+                flash('No registered user associated with '+emailuser, category="error")
 
     return render_template('login.html', user=current_user)
 
@@ -72,7 +73,7 @@ def register():
             db.session.commit()
 
             login_user(new_user,remember=True)
-            flash('User registered successfully')
+            flash('User registered successfully', category='success')
             return redirect(url_for('views.home'))
 
     return render_template('register.html', user=current_user)
