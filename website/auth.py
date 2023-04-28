@@ -77,9 +77,14 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            login_user(new_user, remember=True)
-            flash('User registered successfully', category='success')
-            return redirect(url_for('views.home'))
+            sleep(0.25)
+            logged = login_user(new_user,remember=True, fresh=True, force=True)
+            
+            if logged:
+                flash('User registered successfully', category='success')
+                return redirect(url_for('views.home'))
+            else:
+                flash('something went wrong logging you in', category='error')
 
     return render_template('register.html', user=current_user)
 
