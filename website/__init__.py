@@ -110,6 +110,7 @@ def create_database(app,db,es):
             import os
             os.remove("instance/"+DB_NAME)
             raise Exception('db is empty -- deleted')
+        
         print(f"Number of documents in '{index_name}' index: {escount}\nNumber in QUOTES db:{qcount}")
         if int(escount) != int(qcount):
             from website.helper_funcs import bulk_process_quotes
