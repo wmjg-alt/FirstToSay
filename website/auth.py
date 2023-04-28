@@ -5,6 +5,7 @@ from .helper_funcs import author_normalize
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from string import printable
+from time import sleep
 
 auth = Blueprint('auth', __name__)
 
@@ -27,9 +28,13 @@ def login():
 
             if user:
                 if check_password_hash(user.password, pwd):
-                    flash('Successfully logged in as '+emailuser, category='success')
-                    login_user(user,remember=True)
-                    return redirect(url_for('views.home'))
+                    logged = login_user(user,remember=True, fresh=True, force=True)
+                    sleep(0.25)
+                    if logged:
+                        flash('Successfully logged in as '+emailuser, category='success')
+                        return redirect(url_for('views.home'))
+                    else:
+                        flash('something went wrong logging you in', category='error')
                 else:
                     flash('Password fail, incorrect', category="error")
             else:
@@ -72,7 +77,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            login_user(new_user,remember=True)
+            login_user(new_user, remember=True)
             flash('User registered successfully', category='success')
             return redirect(url_for('views.home'))
 
