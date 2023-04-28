@@ -2,9 +2,11 @@
 {% block title %} REGISTER {% endblock %}
 {% block content %} 
 <form method="POST">
-    <h3 align='center'> REGISTER </h3>
+    <h3 align='center'> Welcome Newcomer </h3>
+    <h4> Register to Join the ranks of William Shakespeare; william@shakespeare.com; in the quest to be the FirstToSay </h4>
     <div class="form-group">
         <label form="email"> EMAIL ADDRESS</label>
+        <small class="text-muted" style="color:maroon"> something@something.com -- We won't send you a thing. </small>
         <input 
             type="text" 
             id="email" 
@@ -12,8 +14,8 @@
             class="form-control" 
             placeholder="ENTER EMAIL"  
         />
-
         <label form="username"> YOUR NAME </label>
+        <small class="text-muted" style="color:maroon"> A name, like William Shakespeare, however you want, but it is public </small>
         <input 
             type="text" 
             id="username" 
@@ -21,8 +23,8 @@
             class="form-control" 
             placeholder="PICK A USERNAME"  
         />
-
         <label form="password1"> PASSWORD </label>
+        <small class="text-muted" style="color:maroon"> 8 character minimum </small>
         <input 
             type="password" 
             id="password1" 
@@ -30,7 +32,6 @@
             class="form-control" 
             placeholder="ENTER PASSWORD"  
         />
-
         <label form="password2"> PASSWORD CONFIRM </label>
         <input 
             type="password" 
@@ -42,6 +43,6 @@
 
         <br/>
         <div align="center">
-            <button class="btn btn-dark" type="submit"> REGISTER </button>
+            <button class="btn btn-dark" type="submit"> REGISTER TO SAY </button>
         </div>
 {% endblock %}

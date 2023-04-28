@@ -2,12 +2,14 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_login import login_required, current_user
 from .models import Quote, User, Like
 from . import db, es, index_name
-from .helper_funcs import save_a_quote, sent_normalize
+from .helper_funcs import save_a_quote, sent_normalize, test_language
+from string import printable
+
 import difflib
 
 views = Blueprint('views',__name__)
 
-def compare_texts(user_text):
+def compare_texts(user_text, current_user):
     es_hits = search_es(user_text)
     print(es_hits)
     quote_ids = [hit['_source']['id'] for hit in es_hits]
@@ -26,6 +28,9 @@ def compare_texts(user_text):
                 similarities.append(Q)
             if text_ratio >= 0.95 or matched:
                 matched = True
+            elif text_ratio >= 0.85:
+                other = User.query.filter_by(id=Q.author).first()
+                current_user.followed(other)
         similarities.sort(key=lambda x: x.sim, reverse=True)
     
     return similarities[:5] if similarities else [], matched
@@ -37,7 +42,7 @@ def search_es(query_text):
             "match": {
                 "text": {
                     "query": query_text,
-                    "analyzer": "snowball"
+                    "analyzer": "myanalyzer"
                 }
             }
         },
@@ -68,9 +73,13 @@ def home():
         
         if not text:
             flash('Empty quotes not accepted',category='error')
+        elif not not (set(text) - set(printable)):
+            flash("Can't handle some of those symbols", category='error')
+        elif not test_language(text):
+            flash("the great oracle spacy tells me you just posted cringe. an unbelievable sentence", category='error')
         else:
             text= sent_normalize(text)
-            similar_texts, matched = compare_texts(text)
+            similar_texts, matched = compare_texts(text, current_user)
             print("MATCHES:", matched)
 
             if not matched:

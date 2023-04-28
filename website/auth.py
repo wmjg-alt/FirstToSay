@@ -4,6 +4,7 @@ from .models import User
 from .helper_funcs import author_normalize
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from string import printable
 
 auth = Blueprint('auth', __name__)
 
@@ -14,13 +15,13 @@ def login():
         emailuser = request.form.get('emailuser')
         pwd = request.form.get('password')
         if not emailuser or not pwd:
-            flash('Enter an email and a password', category='error')
+            flash('Enter an email/username and a password', category='error')
 
         if "@" in emailuser:
             emailuser = emailuser.lower()
             user = User.query.filter_by(email=emailuser).first()
         else:
-            emailuser = emailuser.upper()
+            emailuser = emailuser.lower()
             user = User.query.filter_by(username=emailuser).first()
 
         if user:
@@ -49,19 +50,19 @@ def register():
         if email_exists:
             flash('Email already associated with an account', category="error")
         elif user_exists:
-            flash("That Username is already take", category='error')
+            flash("That Name is already taken; add something", category='error')
         elif pwd1 != pwd2:
             flash("Passwords do not match. Passwords are case sensitive.", category='error')
         elif len(username) <=2:
-            flash('Username too short',category="error")
+            flash('Thats not a name',category="error")
         elif "@" in username:
-            flash('Symbol @ not allowed in username', category="error")
-        elif " " not in username:
-            flash("Full name please, with spaces", category='error')
+            flash('No @s in usernames, thanks',category="error")
+        elif not not (set(username) - set(printable)):
+            flash('Symbols not allowed in username', category="error")
         elif len(pwd1) <= 7:
             flash('Password too short. Minimum length = 8 characters',category="error")
         #elif  fail to reach a real email? authenticatioN?
-        elif "@" not in email or len(email) <= 3:
+        elif "@" not in email or len(email) <= 5:
             flash('Email '+email+" invalid", category="error")
         else:
             new_user = User(email=email, 

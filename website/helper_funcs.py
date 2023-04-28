@@ -1,11 +1,28 @@
 from .models import User, Quote
 
 from elasticsearch.helpers import parallel_bulk
-from nltk import sent_tokenize
+#from nltk import sent_tokenize
 import pandas as pd
 from werkzeug.security import generate_password_hash, check_password_hash
+from spacy_langdetect import LanguageDetector
+import spacy
 
+@spacy.Language.factory("language_detector")
+def get_lang_detector(nlp, name):
+   return LanguageDetector()
+
+nlp = spacy.load("en_core_web_sm")
+nlp.add_pipe('language_detector', last=True)
 base_text_length = 256
+accept_langs = ['en','fr','es','de','nl','da','nl', 'el','it', 'pt', 'ja','zh',] #western bias galore
+
+def test_language(s):
+    #decided on a spacy threshhold of 0.9 -- it detects gibberish as certain langs
+    doc = nlp(s) 
+    detect_language = doc._.language
+    print(detect_language)
+    return detect_language['score'] > 0.9 and detect_language['language'] in accept_langs
+
 
 def sent_normalize(s):
     if isinstance(s, int) or isinstance(s, float):
@@ -143,7 +160,8 @@ def pre_fill_db(db,es,index_name):
     # https://www.kaggle.com/datasets/manann/quotes-500k
     # https://www.kaggle.com/datasets/iampunitkmryh/funny-quotes?resource=download
     # https://www.kaggle.com/datasets/faseehurrehman/popular-quotes
-    injest_csv_to_dfs(['data/quotes.csv','data/quotes_funny.csv','data/Popular_Quotes.csv'], db)
+    # https://www.kaggle.com/datasets/abhishekvermasg1/goodreads-quotes
+    injest_csv_to_dfs(['data/quotes.csv','data/quotes_funny.csv','data/Popular_Quotes.csv', 'data/quotes2,csv'], db)
 
     print("bulk processing db to es")
     bulk_process_quotes(db, es, index_name, )
