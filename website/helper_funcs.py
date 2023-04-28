@@ -15,6 +15,7 @@ nlp = spacy.load("en_core_web_sm")
 nlp.add_pipe('language_detector', last=True)
 base_text_length = 256
 accept_langs = ['en','fr','es','de','nl','da','nl', 'el','it', 'pt', 'ja','zh',] #western bias galore
+fail_file = "data/fails.txt"
 
 def test_language(s):
     #decided on a spacy threshhold of 0.9 -- it detects gibberish as certain langs
@@ -40,7 +41,7 @@ def author_normalize(a):
     return a.lower().strip()
 
 def write_fail(idx, sent, author, message):
-    with open('fails.txt','a', encoding='utf8') as f:
+    with open(fail_file,'a', encoding='utf8') as f:
         f.write(str(idx) +"\t"+ sent +"\t"+ author + message+"\n")
 
 def author_key(author):
@@ -161,6 +162,10 @@ def pre_fill_db(db,es,index_name):
     # https://www.kaggle.com/datasets/iampunitkmryh/funny-quotes?resource=download
     # https://www.kaggle.com/datasets/faseehurrehman/popular-quotes
     # https://www.kaggle.com/datasets/abhishekvermasg1/goodreads-quotes
+    try:
+        import os
+        os.remove(fail_file)
+    
     injest_csv_to_dfs(['data/quotes.csv','data/quotes_funny.csv','data/Popular_Quotes.csv', 'data/quotes2,csv'], db)
 
     print("bulk processing db to es")
