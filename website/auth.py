@@ -8,12 +8,13 @@ from . import db
 from .models import User
 from .helper_funcs import author_normalize
 
-allowed_chars = set(ascii_letters + digits + punctuation + whitespace) # minimize to utf8
+# minimize to utf8
+allowed_chars = set(ascii_letters + digits + punctuation + whitespace)
 
 auth = Blueprint('auth', __name__)
 
 
-@auth.route('/login',methods=["GET","POST"])
+@auth.route('/login', methods=["GET", "POST"])
 def login():
     ''' route handling for login, lots of user rules
         POST -> credential checking
@@ -35,22 +36,28 @@ def login():
 
             if user:
                 if check_password_hash(user.password, pwd):
-                    logged = login_user(user,remember=True, fresh=True, force=True)
+                    logged = login_user(user,
+                                        remember=True,
+                                        fresh=True,
+                                        force=True)
                     sleep(0.25)
                     if logged:
-                        flash('Successfully logged in as '+emailuser, category='success')
+                        flash('Successfully logged in as '+emailuser,
+                              category='success')
                         return redirect(url_for('views.home'))
                     else:
-                        flash('something went wrong logging you in', category='error')
+                        flash('something went wrong logging you in',
+                              category='error')
                 else:
                     flash('Password fail, incorrect', category="error")
             else:
-                flash('No registered user associated with '+emailuser, category="error")
+                flash('No registered user associated with '+emailuser,
+                      category="error")
 
     return render_template('login.html', user=current_user)
 
 
-@auth.route('/register',methods=["GET","POST"])
+@auth.route('/register', methods=["GET", "POST"])
 def register():
     ''' route handling for registering a user
         lots of user input rules
@@ -64,32 +71,43 @@ def register():
         user_exists = User.query.filter_by(username=username).first()
 
         if email_exists:
-            flash('Email already associated with an account', category="error")
+            flash('Email already associated with an account',
+                  category="error")
         elif user_exists:
-            flash("That Name is already taken; add something", category='error')
+            flash("That Name is already taken; add something",
+                  category='error')
         elif pwd1 != pwd2:
-            flash("Passwords do not match. Passwords are case sensitive.", category='error')
-        elif len(username) <=2:
-            flash('Thats not a name',category="error")
+            flash("Passwords do not match. Passwords are case sensitive.",
+                  category='error')
+        elif len(username) <= 2:
+            flash('Thats not a name',
+                  category="error")
         elif "@" in username:
-            flash('No @s in usernames, thanks',category="error")
+            flash('No @s in usernames, thanks',
+                  category="error")
         elif not not (set(username) - allowed_chars):
             flash('Symbols not allowed in username', category="error")
         elif len(pwd1) <= 7:
-            flash('Password too short. Minimum length = 8 characters',category="error")
-        #elif  fail to reach a real email? authenticatioN?
+            flash('Password too short. Minimum length = 8 characters',
+                  category="error")
+        # elif  fail to reach a real email? authenticatioN?
         elif "@" not in email or len(email) <= 5:
-            flash('Email '+email+" invalid", category="error")
+            flash('Email '+email+" invalid",
+                  category="error")
         else:
-            new_user = User(email=email, 
-                            username=author_normalize(username), 
-                            password=generate_password_hash(pwd1, method='sha256'))
+            new_user = User(email=email,
+                            username=author_normalize(username),
+                            password=generate_password_hash(pwd1,
+                                                            method='sha256'))
             db.session.add(new_user)
             db.session.commit()
 
             sleep(0.25)
-            logged = login_user(new_user,remember=True, fresh=True, force=True)
-            
+            logged = login_user(new_user,
+                                remember=True,
+                                fresh=True,
+                                force=True)
+
             if logged:
                 flash('User registered successfully', category='success')
                 return redirect(url_for('views.home'))
@@ -107,4 +125,3 @@ def logout():
     flash('Successfully logged out from '+current_user.username)
     logout_user()
     return redirect(url_for("views.home"))
-
