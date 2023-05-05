@@ -1,17 +1,24 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from string import ascii_letters, digits, punctuation, whitespace
+from time import sleep
+
 from . import db
 from .models import User
 from .helper_funcs import author_normalize
-from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from string import printable
-from time import sleep
+
+allowed_chars = set(ascii_letters + digits + punctuation + whitespace) # minimize to utf8
 
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/login',methods=["GET","POST"])
 def login():
+    ''' route handling for login, lots of user rules
+        POST -> credential checking
+        GET - > display login page
+    '''
     if request.method == 'POST':
         emailuser = request.form.get('emailuser')
         pwd = request.form.get('password')
@@ -45,6 +52,9 @@ def login():
 
 @auth.route('/register',methods=["GET","POST"])
 def register():
+    ''' route handling for registering a user
+        lots of user input rules
+    '''
     if request.method == 'POST':
         email = request.form.get('email').lower()
         username = request.form.get('username').upper()
@@ -63,7 +73,7 @@ def register():
             flash('Thats not a name',category="error")
         elif "@" in username:
             flash('No @s in usernames, thanks',category="error")
-        elif not not (set(username) - set(printable)):
+        elif not not (set(username) - allowed_chars):
             flash('Symbols not allowed in username', category="error")
         elif len(pwd1) <= 7:
             flash('Password too short. Minimum length = 8 characters',category="error")
@@ -92,6 +102,7 @@ def register():
 @auth.route('/logout')
 @login_required
 def logout():
+    ''' logout handling, returning home -> new user login'''
     print(current_user)
     flash('Successfully logged out from '+current_user.username)
     logout_user()
