@@ -1,9 +1,8 @@
 # First to Say
-             firsttosay.com:8080                                                   wmjg
+                                                                wmjg
 ### A webapp playing with document similarity
 #### Say something original or be shamed as a copycat
 
-* check it out at: firsttosay.com:8080
 
     A docker-compose is included to allow you to deploy it all the same way I do.
 
